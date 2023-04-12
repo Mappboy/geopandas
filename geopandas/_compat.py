@@ -43,7 +43,7 @@ try:
 except ImportError:
     import psycopg2 as psycopg
 
-PSYCOPG_GE_30 = Version(psycopg.__version__) >= "3.0.0"
+PSYCOPG_GE_30 = Version(psycopg.__version__) >= Version("3.0.0")
 
 HAS_PYGEOS = None
 USE_PYGEOS = None
