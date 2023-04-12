@@ -332,14 +332,17 @@ def _psql_insert_copy(tbl, conn, keys, data_iter):
 
     dbapi_conn = conn.connection
     with dbapi_conn.cursor() as cur:
-        sql = 'COPY "{}"."{}" ({}) FROM STDIN WITH CSV'.format(
-            tbl.table.schema, tbl.table.name, columns
-        )
         if compat.PSYCOPG_GE_30:
+            sql = 'COPY "{}"."{}" ({}) FROM STDIN'.format(
+                tbl.table.schema, tbl.table.name, columns
+            )
             with cur.copy(sql) as copy:
                 for record in data_iter:
                     copy.write_row(record)
         else:
+            sql = 'COPY "{}"."{}" ({}) FROM STDIN WITH CSV'.format(
+                tbl.table.schema, tbl.table.name, columns
+            )
             s_buf = io.StringIO()
             writer = csv.writer(s_buf)
             writer.writerows(data_iter)
