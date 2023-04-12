@@ -327,10 +327,6 @@ def _psql_insert_copy(tbl, conn, keys, data_iter):
     import io
     import csv
 
-    s_buf = io.StringIO()
-    writer = csv.writer(s_buf)
-    writer.writerows(data_iter)
-    s_buf.seek(0)
 
     columns = ", ".join('"{}"'.format(k) for k in keys)
 
@@ -339,8 +335,17 @@ def _psql_insert_copy(tbl, conn, keys, data_iter):
         sql = 'COPY "{}"."{}" ({}) FROM STDIN WITH CSV'.format(
             tbl.table.schema, tbl.table.name, columns
         )
-        cur.copy_expert(sql=sql, file=s_buf)
+        if compat.PSYCOPG_GE_30:
+            with cur.copy(sql) as copy:
+                for record in data_iter:
+                    copy.write_row(record)
+        else:
+            s_buf = io.StringIO()
+            writer = csv.writer(s_buf)
+            writer.writerows(data_iter)
+            s_buf.seek(0)
 
+            cur.copy_expert(sql=sql, file=s_buf)
 
 def _write_postgis(
     gdf,

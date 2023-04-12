@@ -10,7 +10,6 @@ import pyproj
 import shapely
 import shapely.geos
 
-
 # -----------------------------------------------------------------------------
 # pandas compat
 # -----------------------------------------------------------------------------
@@ -35,6 +34,16 @@ SHAPELY_G_20a1 = Version(shapely.__version__) > Version("2.0a1")
 
 GEOS_GE_390 = shapely.geos.geos_version >= (3, 9, 0)
 
+# -----------------------------------------------------------------------------
+# psycopg compat
+# -----------------------------------------------------------------------------
+
+try:
+    import psycopg
+except ImportError:
+    import psycopg2 as psycopg
+
+PSYCOPG_GE_30 = Version(psycopg.__version__) >= "3.0.0"
 
 HAS_PYGEOS = None
 USE_PYGEOS = None
